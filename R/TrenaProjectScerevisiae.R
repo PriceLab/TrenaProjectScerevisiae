@@ -4,6 +4,8 @@
 #' @importFrom AnnotationDbi select
 #' @import org.Hs.eg.db
 #'
+#' @importMethodsFrom TrenaProject getGeneRegulatoryRegions
+#'
 #' @title TrenaProjectScerevisiae-class
 #'
 #' @name TrenaProjectScerevisiae-class
@@ -31,8 +33,6 @@
 TrenaProjectScerevisiae <- function(quiet=TRUE)
 
 {
-   genomeName <- "mm10"
-
    directory <- system.file(package="TrenaProjectScerevisiae", "extdata", "geneSets")
    geneSet.files <- list.files(directory)
    geneSets <- list()
@@ -68,3 +68,26 @@ TrenaProjectScerevisiae <- function(quiet=TRUE)
 
 } # TrenaProjectScerevisiae, the constructor
 #----------------------------------------------------------------------------------------------------
+setMethod('getGeneRegulatoryRegions',  signature='TrenaProjectScerevisiae',
+
+    function(obj, targetGene=NA){
+
+       if(is.na(targetGene))
+          targetGene <- getTargetGene(obj)
+
+       x <- getTranscriptsTable(tProj, targetGene)
+       upstream <- 499
+       downstream <- 100
+       start <- x$start - upstream
+       end <- x$start + downstream
+       chrom <- x$chrom
+       if(x$strand == "-"){
+          start <- x$end + upstream
+          end <- x$end - downstream
+          }
+       data.frame(chrom=x$chrom, start=start, end=end, type="Promoter", combinedScore=0, geneSymbol=targetGene,
+                  stringsAsFactors=FALSE)
+    })
+
+#----------------------------------------------------------------------------------------------------
+

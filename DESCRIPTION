@@ -6,7 +6,7 @@ Author: Paul Shannon
 Maintainer: Paul Shannon <pshannon@systemsbiology.org>
 Description: Trena and TrenaViz project information
 Imports: methods
-Depends: R (>= 3.5.1), TrenaProject
+Depends: R (>= 3.5.0), TrenaProject (>= 1.0.5)
 License: Apache 2.0
 Encoding: UTF-8
 LazyData: true

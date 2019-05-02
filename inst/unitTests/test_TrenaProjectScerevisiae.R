@@ -85,14 +85,8 @@ test_setTargetGene <- function()
    message(sprintf("    geneRegion"))
    region <- getGeneRegion(tProj, flankingPercent=0)
    checkTrue(all(c("chromLocString", "chrom", "start", "end") %in% names(region)))
-   checkEquals(region$chromLocString, "chr4:53030787-53159895")
+   checkEquals(region$chromLocString, "I:71786-73288")
 
-   message(sprintf("    enhancers"))
-   tbl.enhancers <- getEnhancers(tProj)
-   checkEquals(colnames(tbl.enhancers), c("chrom", "start", "end", "type", "combinedScore", "geneSymbol"))
-   checkTrue(nrow(tbl.enhancers) >= 0)
-
-     # no enhancers, DHS or ChIP-seq for mouse
 
    #message(sprintf("    geneGeneEnhancersRegion"))
    #region <- getGeneEnhancersRegion(tProj, flankingPercent=0)
@@ -108,6 +102,32 @@ test_setTargetGene <- function()
    #checkEquals(nrow(tbl.chipSeq), 0)
 
 } # test_setTargetGene
+#------------------------------------------------------------------------------------------------------------------------
+test_getGeneRegulatoryRegions <- function()
+{
+   printf("--- test_getRegulatoryRegions")
+   goi <- "CDC19"  # plus strand
+
+   tbl <- getGeneRegulatoryRegions(tProj, goi)
+   checkEquals(tbl$chrom, "I")
+   checkEquals(tbl$start, 71287)
+   checkEquals(tbl$end, 71886)
+   checkTrue(tbl$start < tbl$end)   # since + strand
+   checkEquals(with(tbl, 1+end-start), 600)
+   checkEquals(tbl$geneSymbol, goi)
+   checkEquals(tbl$type, "Promoter")
+
+   goi <- "HPA2"  # on the minus strand
+   tbl <- getGeneRegulatoryRegions(tProj, goi)
+   checkEquals(tbl$chrom, "XVI")
+   checkEquals(tbl$start, 923878)
+   checkEquals(tbl$end, 923279)
+   checkTrue(tbl$start > tbl$end)   # since + strand
+   checkEquals(with(tbl, 1+start-end), 600)
+   checkEquals(tbl$geneSymbol, goi)
+   checkEquals(tbl$type, "Promoter")
+
+} # test_getGeneRegulatoryRegions
 #------------------------------------------------------------------------------------------------------------------------
 if(!interactive())
    runTests()
