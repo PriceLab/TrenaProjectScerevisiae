@@ -14,6 +14,10 @@ runTests <- function()
    test_footprintDatabases()
    test_expressionMatrices()
    test_setTargetGene()
+   test_getGeneRegulatoryRegions()
+
+   test_buildSingleGeneModel()
+
 
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
@@ -105,29 +109,103 @@ test_setTargetGene <- function()
 #------------------------------------------------------------------------------------------------------------------------
 test_getGeneRegulatoryRegions <- function()
 {
-   printf("--- test_getRegulatoryRegions")
-   goi <- "CDC19"  # plus strand
+   printf("--- test_getGeneRegulatoryRegions")
 
-   tbl <- getGeneRegulatoryRegions(tProj, goi)
+   goi <- "CDC19"  # plus strand
+   tbl <- getGeneRegulatoryRegions(tProj, goi)   # default is -2000, +500
+
    checkEquals(tbl$chrom, "I")
-   checkEquals(tbl$start, 71287)
-   checkEquals(tbl$end, 71886)
+   checkEquals(tbl$start, 69786)
+   checkEquals(tbl$end, 72286)
    checkTrue(tbl$start < tbl$end)   # since + strand
-   checkEquals(with(tbl, 1+end-start), 600)
+   checkEquals(with(tbl, end-start), 2500)
    checkEquals(tbl$geneSymbol, goi)
    checkEquals(tbl$type, "Promoter")
 
    goi <- "HPA2"  # on the minus strand
    tbl <- getGeneRegulatoryRegions(tProj, goi)
    checkEquals(tbl$chrom, "XVI")
-   checkEquals(tbl$start, 923878)
-   checkEquals(tbl$end, 923279)
+   checkEquals(tbl$start, 925379)
+   checkEquals(tbl$end,   922879)
    checkTrue(tbl$start > tbl$end)   # since + strand
-   checkEquals(with(tbl, 1+start-end), 600)
+   checkEquals(with(tbl, start-end), 2500)
    checkEquals(tbl$geneSymbol, goi)
    checkEquals(tbl$type, "Promoter")
 
+   tbl <- getClassicalGenePromoter(tProj, goi, 0, 0)
+   checkEquals(tbl$start, tbl$end)
+   tss <- getTranscriptsTable(tProj, goi)$tss
+   checkEquals(tbl$start, tss)
+
+   tbl.goi <- getClassicalGenePromoter(tProj, goi, 100, 10)
+   with(tbl.goi, {
+           checkEquals(start, 923479);
+           checkEquals(end,   923369);
+           checkEquals(chrom, "XVI")
+           })
+
+   tbl.targetGene <- getClassicalGenePromoter(tProj, targetGene=NA, 10, 10)
+   with(tbl.targetGene, {
+           checkEquals(start, 71776);
+           checkEquals(end,   71796);
+           checkEquals(chrom, "I")
+           })
+
 } # test_getGeneRegulatoryRegions
+#------------------------------------------------------------------------------------------------------------------------
+test_buildSingleGeneModel <- function()
+{
+   printf("--- test_buildSingleGeneModel")
+
+   genome <- "SacCer3"
+   targetGene <- "CDC19"
+   tp <- TrenaProjectScerevisiae()
+   setTargetGene(tp, targetGene)
+   tbl.transcript <- getTranscriptsTable(tp)
+
+   tbl.regions <- getGeneRegulatoryRegions(tp)
+   tbl.regions$chrom <- sprintf("chr%s", tbl.regions$chrom)
+
+   library(MotifDb)
+   library(trena)
+   library(trenaSGM)
+   library(org.Sc.sgd.db)
+   pfms <- as.list(jaspar.yeast.pfms <- query(MotifDb, c("cerevisiae", "jaspar2018")))
+
+   motifMatcher <- MotifMatcher(genomeName="SacCer3", pfms)
+   tbl.motifs <- findMatchesByChromosomalRegion(motifMatcher, tbl.regions, pwmMatchMinimumAsPercentage=95L)
+   dim(tbl.motifs)
+   checkTrue(nrow(tbl.motifs) > 80 & nrow(tbl.motifs) < 120)
+   checkEquals(ncol(tbl.motifs), 13)
+   tf.geneSymbols <- mcols(MotifDb[tbl.motifs$motifName])$geneSymbol
+   tbl.motifs$targetGene <- targetGene
+   tbl.motifs$tf <- tf.geneSymbols
+
+   candidate.tfs <- sort(mcols(MotifDb[unique(tbl.motifs$motifName)])$geneSymbol)
+   length(candidate.tfs)
+   getExpressionMatrixNames(tProj)
+   mtx <- getExpressionMatrix(tProj, "GSE115556.asinh")
+   dim(mtx)
+
+   build.spec <- list(title="CDC19.noDNA.allTFs",
+                      type="noDNA.tfsSupplied",
+                      matrix=mtx,
+                      tfPool=candidate.tfs,
+                      tfPrefilterCorrelation=0.0,
+                      annotationDbFile=dbfile(org.Sc.sgd.db),
+                      orderModelByColumn="rfScore",
+                      solverNames=c("lasso", "lassopv", "pearson", "randomForest", "ridge", "spearman"),
+                      quiet=TRUE)
+
+   builder <- NoDnaModelBuilder(genome, targetGene,  build.spec, quiet=TRUE)
+   x <- build(builder)
+   fivenum(x$model$rfScore)
+   tbl.model <- subset(x$mode, rfScore > fivenum(x$model$rfScore)[4])
+   dim(tbl.model)
+   tbl.regRegions <- subset(tbl.motifs, tf %in% tbl.model$gene)
+   dim(tbl.regRegions)
+
+} # test_buildSingleGeneModel
 #------------------------------------------------------------------------------------------------------------------------
 if(!interactive())
    runTests()

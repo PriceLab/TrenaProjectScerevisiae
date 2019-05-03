@@ -14,8 +14,7 @@
 #' @exportClass TrenaProjectScerevisiae
 #'
 
-.TrenaProjectScerevisiae <- setClass("TrenaProjectScerevisiae",
-                                  contains="TrenaProject")
+.TrenaProjectScerevisiae <- setClass("TrenaProjectScerevisiae", contains="TrenaProject")
 
 #----------------------------------------------------------------------------------------------------
 #' Define an object of class TrenaProjectScerevisiae
@@ -71,13 +70,18 @@ TrenaProjectScerevisiae <- function(quiet=TRUE)
 setMethod('getGeneRegulatoryRegions',  signature='TrenaProjectScerevisiae',
 
     function(obj, targetGene=NA){
+       getClassicalGenePromoter(obj, targetGene=targetGene)
+       })
+
+#----------------------------------------------------------------------------------------------------
+setMethod('getClassicalGenePromoter',  signature='TrenaProjectScerevisiae',
+
+    function(obj, targetGene=NA, upstream=2000, downstream=500){
 
        if(is.na(targetGene))
           targetGene <- getTargetGene(obj)
 
-       x <- getTranscriptsTable(tProj, targetGene)
-       upstream <- 499
-       downstream <- 100
+       x <- getTranscriptsTable(obj, targetGene)
        start <- x$start - upstream
        end <- x$start + downstream
        chrom <- x$chrom
