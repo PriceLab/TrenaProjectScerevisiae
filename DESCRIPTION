@@ -1,7 +1,7 @@
 Package: TrenaProjectScerevisiae
 Title: Scerevisiae gene expression and variant data
-Date: 2019-05-03
-Version: 0.99.04
+Date: 2019-06-10
+Version: 0.99.05
 Author: Paul Shannon
 Maintainer: Paul Shannon <pshannon@systemsbiology.org>
 Description: Trena and TrenaViz project information

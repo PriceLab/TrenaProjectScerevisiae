@@ -6,7 +6,7 @@ build:
 	(cd ..; R CMD build --no-build-vignettes trenaProjectScerevisiae)
 
 install:
-	(cd ..; R CMD INSTALL trenaProjectScerevisiae)
+	(cd ..; R CMD INSTALL --no-test-load trenaProjectScerevisiae)
 
 check:
 	(cd ..; R CMD check `ls -t trenaProjectScerevisiae) | head -1`)

@@ -17,7 +17,7 @@ runTests <- function()
    test_getGeneRegulatoryRegions()
 
    test_buildSingleGeneModel()
-
+   test_yeastractRegulatorLookup()
 
 } # runTests
 #------------------------------------------------------------------------------------------------------------------------
@@ -190,6 +190,7 @@ test_buildSingleGeneModel <- function()
    build.spec <- list(title="CDC19.noDNA.allTFs",
                       type="noDNA.tfsSupplied",
                       matrix=mtx,
+                      candidateTFs=candidate.tfs,
                       tfPool=candidate.tfs,
                       tfPrefilterCorrelation=0.0,
                       annotationDbFile=dbfile(org.Sc.sgd.db),
@@ -206,6 +207,17 @@ test_buildSingleGeneModel <- function()
    dim(tbl.regRegions)
 
 } # test_buildSingleGeneModel
+#------------------------------------------------------------------------------------------------------------------------
+test_yeastractRegulatorLookup <- function()
+{
+   printf("--- test_yeastractRegulatorLookup")
+   f <- system.file(package="TrenaProjectScerevisiae", "extdata", "regulatoryModels", "yeastractDocumentedRegulators.RData")
+   tbl.reg <- get(load(f))
+   cdc19.regulators <- subset(tbl.reg, target=="CDC19")$tf
+   checkTrue(length(cdc19.regulators) > 50)
+   checkTrue("GCR1" %in% cdc19.regulators)
+
+} # test_yeastractRegulatorLookup
 #------------------------------------------------------------------------------------------------------------------------
 if(!interactive())
    runTests()
