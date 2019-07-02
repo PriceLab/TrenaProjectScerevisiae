@@ -46,6 +46,8 @@ TrenaProjectScerevisiae <- function(quiet=TRUE)
 
    footprintDatabaseNames <- NA_character_;
    expressionDirectory <- system.file(package="TrenaProjectScerevisiae", "extdata", "expression")
+   genomicRegionsDirectory <- NA_character_
+
    stopifnot(file.exists(expressionDirectory))
 
    variantsDirectory <- system.file(package="TrenaProjectScerevisiae", "extdata", "variants")
@@ -60,6 +62,7 @@ TrenaProjectScerevisiae <- function(quiet=TRUE)
                                          footprintDatabaseNames=NA_character_,
                                          footprintDatabasePort=NA_integer_,
                                          expressionDirectory=expressionDirectory,
+                                         genomicRegionsDirectory=genomicRegionsDirectory,
                                          variantsDirectory=variantsDirectory,
                                          covariatesFile=covariatesFile,
                                          quiet=quiet
