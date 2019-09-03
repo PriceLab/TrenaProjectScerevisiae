@@ -45,14 +45,7 @@ TrenaProjectScerevisiae <- function(quiet=TRUE)
    geneInfoTable.path <- system.file(package="TrenaProjectScerevisiae", "extdata", "geneInfoTable.RData")
 
    footprintDatabaseNames <- NA_character_;
-   expressionDirectory <- system.file(package="TrenaProjectScerevisiae", "extdata", "expression")
-   genomicRegionsDirectory <- NA_character_
-
-   stopifnot(file.exists(expressionDirectory))
-
-   variantsDirectory <- system.file(package="TrenaProjectScerevisiae", "extdata", "variants")
-
-   covariatesFile <- NA_character_;
+   dataDirectory <- system.file(package="TrenaProjectScerevisiae", "extdata")
 
    .TrenaProjectScerevisiae(TrenaProject(projectName="TrenaProjectScerevisiae",
                                          supportedGenes=geneSets[[1]],
@@ -61,10 +54,7 @@ TrenaProjectScerevisiae <- function(quiet=TRUE)
                                          footprintDatabaseHost=NA_character_,
                                          footprintDatabaseNames=NA_character_,
                                          footprintDatabasePort=NA_integer_,
-                                         expressionDirectory=expressionDirectory,
-                                         genomicRegionsDirectory=genomicRegionsDirectory,
-                                         variantsDirectory=variantsDirectory,
-                                         covariatesFile=covariatesFile,
+                                         packageDataDirectory=dataDirectory,
                                          quiet=quiet
                                          ))
 

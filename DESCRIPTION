@@ -1,12 +1,12 @@
 Package: TrenaProjectScerevisiae
 Title: Scerevisiae gene expression and variant data
-Date: 2019-07-02
-Version: 0.99.06
+Date: 2019-09-03
+Version: 1.0.0
 Author: Paul Shannon
 Maintainer: Paul Shannon <pshannon@systemsbiology.org>
 Description: Trena and TrenaViz project information
 Imports: methods
-Depends: R (>= 3.5.0), TrenaProject (>= 1.0.6), BSgenome.Scerevisiae.UCSC.sacCer3
+Depends: R (>= 3.5.0), TrenaProject (>= 1.2.3), BSgenome.Scerevisiae.UCSC.sacCer3
 License: Apache 2.0
 Encoding: UTF-8
 LazyData: true
