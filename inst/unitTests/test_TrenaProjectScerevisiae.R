@@ -10,7 +10,6 @@ runTests <- function()
 {
    test_constructor()
    test_supportedGenes()
-   test_variants()
    test_footprintDatabases()
    test_expressionMatrices()
    test_setTargetGene()
@@ -37,14 +36,6 @@ test_supportedGenes <- function()
    checkTrue(all(subset.expected %in% getSupportedGenes(tProj)))
 
 } # test_supportedGenes
-#------------------------------------------------------------------------------------------------------------------------
-test_variants <- function()
-{
-   message(sprintf("--- test_variants"))
-
-   checkEquals(getVariantDatasetNames(tProj), character(0))
-
-} # test_variants
 #------------------------------------------------------------------------------------------------------------------------
 test_footprintDatabases <- function()
 {
